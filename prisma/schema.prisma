@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
 }
 
 datasource db {
@@ -15,10 +14,9 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Store{
-  id String @id @default(uuid()) 
-  name String
+model Store {
+  id     String @id @map("_id") @default(auto()) @db.ObjectId
+  name   String
   userId String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
+
