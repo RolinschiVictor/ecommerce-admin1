@@ -35,7 +35,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ClerkProvider>
       <html lang="en">
         <body>
-          <Navbar />
           <ToastProvider />
           {children}
           <ModalProvider />
