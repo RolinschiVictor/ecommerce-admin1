@@ -13,7 +13,7 @@ export default async function DashboardLayout({
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect('/sign-in');
   }
   const store = await prismadb.store.findFirst({
     where: {
@@ -23,12 +23,12 @@ export default async function DashboardLayout({
   });
 
   if (!store) {
-    redirect("/");
+    redirect('/');
   }
   return (
-  <>
-  <Navbar />
-  {children}
-  </>
+    <>
+      <Navbar />
+        {children}
+    </>
   );
 };

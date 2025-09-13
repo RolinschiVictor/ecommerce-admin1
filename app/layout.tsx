@@ -1,45 +1,33 @@
-import type { Metadata } from "next";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from '@clerk/nextjs'
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { ModalProvider } from "@/providers/modal-provider";
-import { ToastProvider } from "@/providers/toast-provider";
-import Navbar from "@/components/navbar";
+import { Inter } from 'next/font/google'
+import { ClerkProvider } from '@clerk/nextjs'
+import { ToastProvider } from '@/providers/toast-provider'
 
+import { ModalProvider } from '@/providers/modal-provider'
 
+import './globals.css'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ['latin'] })
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export const metadata = {
+  title: 'Admin Dashboard',
+  description: 'Admin Dashboard',
+}
 
-export const metadata: Metadata = {
-  title: "Admin Dashboard",
-  description: "Admin Dashboard",
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+ 
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>
+         <body className={inter.className}>
           <ToastProvider />
           {children}
-          <ModalProvider />
-        </body>
-      </html>
+          <ModalProvider/>
+         </body>
+      </html>   
     </ClerkProvider>
-  );
+  )
 }
