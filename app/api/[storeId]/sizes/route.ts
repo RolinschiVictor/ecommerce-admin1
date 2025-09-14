@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
 
-// POST Billboard (create)
+
 export async function POST(
   req: Request,
   { params }: { params: { storeId: string } }
@@ -10,18 +10,18 @@ export async function POST(
   try {
     const { userId } = await auth();
     const body = await req.json();
-    const { label, imageUrl } = body;
+    const { name, value } = body;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 });
     }
 
-    if (!label) {
-      return new NextResponse("Label is required", { status: 400 });
+    if (!name) {
+      return new NextResponse("Name is required", { status: 400 });
     }
 
-    if (!imageUrl) {
-      return new NextResponse("Image URL is required", { status: 400 });
+    if (!value) {
+      return new NextResponse("Value is required", { status: 400 });
     }
 
     if (!params.storeId) {
@@ -39,17 +39,17 @@ export async function POST(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    const billboard = await prismadb.billboard.create({
+    const size = await prismadb.size.create({
       data: {
-        label,
-        imageUrl,
+        name,
+        value,
         storeId: params.storeId,
       },
     });
 
-    return NextResponse.json(billboard);
+    return NextResponse.json(size);
   } catch (error) {
-    console.log("[BILLBOARDS_POST]", error);
+    console.log("[SIZES_POST]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
@@ -65,15 +65,15 @@ export async function GET(
     }
 
 
-    const billboards = await prismadb.billboard.findMany({
+    const sizes = await prismadb.size.findMany({
         where: {
             storeId: params.storeId,
         },
     });
-    return NextResponse.json(billboards);
+    return NextResponse.json(sizes);
 }
     catch (error) {
-        console.log("[BILLBOARDS_GET]", error);
+        console.log("[SIZES_GET]", error);
         return new Response("Internal error", { status: 500 });
     }
 }
