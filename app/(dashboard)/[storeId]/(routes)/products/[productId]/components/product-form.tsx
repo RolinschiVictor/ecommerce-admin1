@@ -1,5 +1,6 @@
 "use client";
 
+import * as z from "zod";
 import { AlertModal } from "@/components/modals/alert-modal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -30,23 +31,10 @@ import { Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import toast from "react-hot-toast";
-import { z } from "zod";
 
-interface ProductFormProps {
-  initialData:
-    | (Product & {
-        images: Image[];
-      })
-    | null;
 
-  categories: Category[];
-  colors: Color[];
-  sizes: Size[];
-}
-
-// formSchema -> ProductFormValues -> ProductForm using react hook form -> onSubmit -> update store
 const formSchema = z.object({
   name: z.string().min(1),
   images: z.object({ url: z.string() }).array(),
@@ -59,6 +47,16 @@ const formSchema = z.object({
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
+
+interface ProductFormProps {
+  initialData: Product & {
+        images: Image[];
+      } | null;
+
+  categories: Category[];
+  colors: Color[];
+  sizes: Size[];
+}
 
 export const ProductForm: React.FC<ProductFormProps> = ({
   initialData,
@@ -84,10 +82,18 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   const action = initialData ? "Save Changes" : "Create Product";
 
-  const defaultValues = initialData
+  const form = useForm<ProductFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues:  initialData
     ? {
-        ...initialData,
-        price: parseFloat(String(initialData?.price)),
+      name: initialData.name,
+      images: initialData.images.map((img) => ({ url: img.url })), // 👈 transformare
+      price: parseFloat(String(initialData.price)),
+      categoryId: initialData.categoryId,
+      colorId: initialData.colorId,
+      sizeId: initialData.sizeId,
+      isFeatured: initialData.isFeatured,
+      isArchived: initialData.isArchived,
       }
     : {
         name: "",
@@ -98,12 +104,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         sizeId: "",
         isFeatured: false,
         isArchived: false,
-      };
-
-  const form = useForm<ProductFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues,
-  });
+      }
+    });
 
   // onDelete -> delete store -> refresh page -> redirect to root page (root layout will check if user has store and open createStore Modal if not found -> create store page will check if user has store and redirect to dashboard if found )
 
@@ -139,7 +141,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
       router.refresh();
 
-      router.push("/");
+      router.push(`/${params.storeId}/products`);
       toast.success("Product deleted successfully");
     } catch (error: any) {
       toast.error("Something went wrong. ");
